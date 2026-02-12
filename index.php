@@ -12,6 +12,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@300;400;600;800&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="assets/css/mobile.css">
   
   <style>
     :root {
@@ -205,18 +206,38 @@
   <nav class="fixed top-0 w-full glass-nav z-50">
     <div class="max-w-7xl mx-auto px-6 h-20 flex justify-between items-center">
       <div class="flex items-center gap-3">
-        <img src="assets/img/logo.png" alt="Logo" class="w-12 h-12 object-contain bg-white rounded-full p-1">
+        <img src="assets/img/logo.png" alt="Logo" class="w-10 h-10 md:w-12 md:h-12 object-contain bg-white rounded-full p-1">
         <div class="flex flex-col">
-          <span class="text-lg font-bold tech-text text-blue-400 leading-none">RCLAMS-CCS</span>
-          <span class="text-[10px] uppercase tracking-widest text-gray-400">Santa Rita College of Pampanga</span>
-          <span class="text-[9px] uppercase tracking-tight text-blue-500/60 font-semibold">College of Computer Studies</span>
+          <span class="text-base md:text-lg font-bold tech-text text-blue-400 leading-none">RCLAMS-CCS</span>
+          <span class="text-[8px] md:text-[10px] uppercase tracking-widest text-gray-400">Santa Rita College of Pampanga</span>
+          <span class="text-[7px] md:text-[9px] uppercase tracking-tight text-blue-500/60 font-semibold">College of Computer Studies</span>
         </div>
       </div>
+      
+      <!-- Desktop Menu -->
       <div class="hidden md:flex items-center gap-8">
         <a href="#about" class="text-sm font-medium text-gray-300 hover:text-white transition-colors">About</a>
         <a href="login.php" class="text-xs px-4 py-2 bg-white/5 border border-white/10 rounded-full hover:bg-white/10 transition-all">Admin Portal</a>
         <a href="teacher/teacher_login.php" class="text-xs px-5 py-2.5 bg-blue-600 rounded-full font-bold shadow-lg shadow-blue-500/20 hover:bg-blue-500 transition-all">Faculty Portal</a>
       </div>
+
+      <!-- Mobile Toggle -->
+      <button id="mobile-menu-btn" class="md:hidden text-gray-300 hover:text-white text-2xl">
+        <i class="fas fa-bars-staggered"></i>
+      </button>
+    </div>
+
+    <!-- Mobile Menu -->
+    <div id="mobile-menu" class="hidden md:hidden absolute top-20 left-0 w-full bg-slate-900/95 backdrop-blur-xl border-b border-white/5 py-8 px-6 space-y-6 animate-fade-in shadow-2xl">
+      <a href="#about" class="block text-lg font-medium text-gray-300 hover:text-blue-400 transition-colors border-b border-white/5 pb-4">
+        <i class="fas fa-info-circle mr-3 text-blue-500"></i> About
+      </a>
+      <a href="login.php" class="block text-lg font-medium text-gray-300 hover:text-blue-400 transition-colors border-b border-white/5 pb-4">
+        <i class="fas fa-user-shield mr-3 text-cyan-500"></i> Admin Portal
+      </a>
+      <a href="teacher/teacher_login.php" class="block text-lg font-medium text-gray-300 hover:text-blue-400 transition-colors pb-4">
+        <i class="fas fa-chalkboard-teacher mr-3 text-indigo-500"></i> Faculty Portal
+      </a>
     </div>
   </nav>
 
@@ -401,8 +422,38 @@
     const scanStatus = document.getElementById('scan-status');
     const portalOverlay = document.getElementById('portal-overlay');
     const portalRing = document.getElementById('portal-ring');
+    const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+    const mobileMenu = document.getElementById('mobile-menu');
 
-    document.addEventListener('click', () => rfidInput.focus());
+    // Mobile Menu Toggle
+    mobileMenuBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      mobileMenu.classList.toggle('hidden');
+    });
+
+    mobileMenu.addEventListener('click', (e) => {
+      if (e.target.tagName === 'A' || e.target.closest('a')) {
+        mobileMenu.classList.add('hidden');
+      }
+    });
+
+    const isMobile = () => window.innerWidth <= 900;
+
+    document.addEventListener('click', (e) => {
+      if (!mobileMenu.contains(e.target) && !mobileMenuBtn.contains(e.target)) {
+        mobileMenu.classList.add('hidden');
+      }
+      
+      // Only autofocus on non-mobile devices to prevent keyboard popup
+      if (!isMobile()) {
+        rfidInput.focus();
+      }
+    });
+    
+    // Check initial focus
+    if (!isMobile()) {
+        rfidInput.focus();
+    }
     
     rfidInput.addEventListener('keydown', (e) => {
       if (e.key === 'Enter') {

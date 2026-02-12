@@ -10,6 +10,72 @@
 /* Base Mobile Reset (900px and below) */
 @media (max-width: 900px) {
 
+    /* LANDING PAGE (INDEX.PHP) SPECIFIC FIXES */
+    header.h-screen {
+        height: auto !important;
+        min-height: 100vh;
+        padding-top: 100px;
+        padding-bottom: 60px;
+    }
+
+    .perspective-container {
+        min-height: auto !important;
+        padding: 1rem !important;
+        perspective: none !important; /* Disable 3D on mobile for better touch performance */
+    }
+
+    .scanner-card {
+        max-width: 100% !important;
+        aspect-ratio: auto !important;
+        padding: 2.5rem 1.5rem !important;
+        min-height: 480px;
+        transform: none !important; /* Force no tilt on mobile */
+    }
+
+    .scanner-card .scan-orbit {
+        width: 240px !important;
+        height: 240px !important;
+    }
+
+    .scanner-card .scan-orbit-inner {
+        width: 170px !important;
+        height: 170px !important;
+    }
+
+    h1.text-5xl {
+        font-size: 2.2rem !important;
+        line-height: 1.2 !important;
+        text-align: center;
+    }
+
+    .lg\:grid-cols-2 {
+        grid-template-columns: 1fr !important;
+        text-align: center;
+    }
+
+    .justify-start {
+        justify-content: center !important;
+    }
+
+    .max-w-lg {
+        max-width: 100% !important;
+        margin: 0 auto;
+    }
+
+    /* ABOUT SECTION */
+    #about .grid-cols-2 {
+        grid-template-columns: 1fr !important;
+    }
+    
+    #about .pt-12 {
+        padding-top: 0 !important;
+    }
+
+    .py-24 {
+        padding-top: 4rem !important;
+        padding-bottom: 4rem !important;
+    }
+
     /* FORCE FULL WIDTH LAYOUT */
     .app-content,
     .main-content,

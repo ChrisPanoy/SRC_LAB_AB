@@ -49,9 +49,16 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['assign_subject'])) {
         $yl_int   = 0;
         $sec_int  = 0;
 
-        if ($resCourse = $conn->query("SELECT course_id FROM courses ORDER BY course_id ASC LIMIT 1")) {
-            if ($rowCourse = $resCourse->fetch_assoc()) {
-                $cid_int = (int)$rowCourse['course_id'];
+        // Default course: prioritize BSIS
+        $courseRes = $conn->query("SELECT course_id FROM courses WHERE course_code = 'BSIS' LIMIT 1");
+        if ($courseRes && $rowCourse = $courseRes->fetch_assoc()) {
+            $cid_int = (int)$rowCourse['course_id'];
+        } else {
+            // Fallback to first course if BSIS not found
+            if ($resCourse = $conn->query("SELECT course_id FROM courses ORDER BY course_id ASC LIMIT 1")) {
+                if ($rowCourse = $resCourse->fetch_assoc()) {
+                    $cid_int = (int)$rowCourse['course_id'];
+                }
             }
         }
 
