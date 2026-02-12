@@ -373,37 +373,6 @@ include '../includes/header.php';
             </h1>
             
             <!-- Academic Year and Semester Filter -->
-            <div style="max-width: 700px; margin: 0 auto 2rem; background: #f8fafc; padding: 1.5rem; border-radius: 0.75rem; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
-                <form method="GET" action="" id="filterForm" style="display: flex; gap: 1rem; align-items: center; flex-wrap: wrap; justify-content: center;">
-                    <div style="flex: 1; min-width: 200px;">
-                        <label style="display: block; font-size: 0.85rem; font-weight: 600; color: #4b5563; margin-bottom: 0.5rem;">Academic Year</label>
-                        <select name="ay_id" onchange="document.getElementById('filterForm').submit()" style="width: 100%; padding: 0.75rem; border: 2px solid #e2e8f0; border-radius: 0.5rem; font-size: 0.95rem; background: white;">
-                            <?php if ($all_academic_years): ?>
-                                <?php $all_academic_years->data_seek(0); while ($ay = $all_academic_years->fetch_assoc()): ?>
-                                    <option value="<?= $ay['ay_id'] ?>" <?= $ay['ay_id'] == $ay_id ? 'selected' : '' ?>>
-                                        <?= htmlspecialchars($ay['ay_name']) ?>
-                                    </option>
-                                <?php endwhile; ?>
-                            <?php endif; ?>
-                        </select>
-                    </div>
-                    <div style="flex: 1; min-width: 200px;">
-                        <label style="display: block; font-size: 0.85rem; font-weight: 600; color: #4b5563; margin-bottom: 0.5rem;">Semester</label>
-                        <select name="sem_id" onchange="document.getElementById('filterForm').submit()" style="width: 100%; padding: 0.75rem; border: 2px solid #e2e8f0; border-radius: 0.5rem; font-size: 0.95rem; background: white;">
-                            <?php if ($all_semesters): ?>
-                                <?php $all_semesters->data_seek(0); while ($sem = $all_semesters->fetch_assoc()): ?>
-                                    <option value="<?= $sem['semester_id'] ?>" <?= $sem['semester_id'] == $sem_id ? 'selected' : '' ?>>
-                                        Semester <?= htmlspecialchars($sem['semester_now']) ?>
-                                    </option>
-                                <?php endwhile; ?>
-                            <?php endif; ?>
-                        </select>
-                    </div>
-                </form>
-                <p style="text-align: center; margin-top: 1rem; font-size: 0.9rem; color: #6b7280;">
-                    Viewing: <strong><?= htmlspecialchars($selected_ay_name) ?></strong> - <strong>Semester <?= htmlspecialchars($selected_sem_name) ?></strong>
-                </p>
-            </div>
 
 
             <?php if ($totalPages > 1): ?>
