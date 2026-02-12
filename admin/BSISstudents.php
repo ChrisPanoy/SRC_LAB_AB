@@ -39,9 +39,32 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_year'])) {
     exit();
 }
 
-// Group BSIS admissions by year level and section in CURRENT session
-$ay_id  = (int)($_SESSION['active_ay_id'] ?? 0);
-$sem_id = (int)($_SESSION['active_sem_id'] ?? 0);
+// Allow user to select Academic Year and Semester via GET params, or default to session
+$selected_ay_id = isset($_GET['ay_id']) && is_numeric($_GET['ay_id']) ? (int)$_GET['ay_id'] : (int)($_SESSION['active_ay_id'] ?? 0);
+$selected_sem_id = isset($_GET['sem_id']) && is_numeric($_GET['sem_id']) ? (int)$_GET['sem_id'] : (int)($_SESSION['active_sem_id'] ?? 0);
+
+$ay_id  = $selected_ay_id;
+$sem_id = $selected_sem_id;
+
+// Fetch all academic years and semesters for the filter dropdowns
+$all_academic_years = $conn->query("SELECT ay_id, ay_name FROM academic_years ORDER BY ay_id DESC");
+$all_semesters = $conn->query("SELECT semester_id, ay_id, semester_now FROM semesters ORDER BY semester_id DESC");
+
+// Get the name of the selected AY and Semester for display
+$selected_ay_name = 'N/A';
+$selected_sem_name = 'N/A';
+if ($ay_id > 0) {
+    $ayRes = $conn->query("SELECT ay_name FROM academic_years WHERE ay_id = $ay_id");
+    if ($ayRow = $ayRes->fetch_assoc()) {
+        $selected_ay_name = $ayRow['ay_name'];
+    }
+}
+if ($sem_id > 0) {
+    $semRes = $conn->query("SELECT semester_now FROM semesters WHERE semester_id = $sem_id");
+    if ($semRow = $semRes->fetch_assoc()) {
+        $selected_sem_name = $semRow['semester_now'];
+    }
+}
 
 // Fixed query: Added yl.level to SELECT list to satisfy DISTINCT + ORDER BY requirement
 $sql = "SELECT DISTINCT st.student_id, yl.year_name, yl.level, sct.section_name,
@@ -348,19 +371,46 @@ include '../includes/header.php';
             <h1 class="page-title text-gradient">
                  BSIS Students 
             </h1>
-            <p class="page-subtitle">
-                <?php 
-                $ay_name = $_SESSION['active_ay_name'] ?? 'N/A';
-                $sem_name = $_SESSION['active_sem_now'] ?? 'N/A';
-                echo "Managing students for <strong>$ay_name</strong> - <strong>$sem_name</strong>";
-                ?>
-            </p>
+            
+            <!-- Academic Year and Semester Filter -->
+            <div style="max-width: 700px; margin: 0 auto 2rem; background: #f8fafc; padding: 1.5rem; border-radius: 0.75rem; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+                <form method="GET" action="" id="filterForm" style="display: flex; gap: 1rem; align-items: center; flex-wrap: wrap; justify-content: center;">
+                    <div style="flex: 1; min-width: 200px;">
+                        <label style="display: block; font-size: 0.85rem; font-weight: 600; color: #4b5563; margin-bottom: 0.5rem;">Academic Year</label>
+                        <select name="ay_id" onchange="document.getElementById('filterForm').submit()" style="width: 100%; padding: 0.75rem; border: 2px solid #e2e8f0; border-radius: 0.5rem; font-size: 0.95rem; background: white;">
+                            <?php if ($all_academic_years): ?>
+                                <?php $all_academic_years->data_seek(0); while ($ay = $all_academic_years->fetch_assoc()): ?>
+                                    <option value="<?= $ay['ay_id'] ?>" <?= $ay['ay_id'] == $ay_id ? 'selected' : '' ?>>
+                                        <?= htmlspecialchars($ay['ay_name']) ?>
+                                    </option>
+                                <?php endwhile; ?>
+                            <?php endif; ?>
+                        </select>
+                    </div>
+                    <div style="flex: 1; min-width: 200px;">
+                        <label style="display: block; font-size: 0.85rem; font-weight: 600; color: #4b5563; margin-bottom: 0.5rem;">Semester</label>
+                        <select name="sem_id" onchange="document.getElementById('filterForm').submit()" style="width: 100%; padding: 0.75rem; border: 2px solid #e2e8f0; border-radius: 0.5rem; font-size: 0.95rem; background: white;">
+                            <?php if ($all_semesters): ?>
+                                <?php $all_semesters->data_seek(0); while ($sem = $all_semesters->fetch_assoc()): ?>
+                                    <option value="<?= $sem['semester_id'] ?>" <?= $sem['semester_id'] == $sem_id ? 'selected' : '' ?>>
+                                        Semester <?= htmlspecialchars($sem['semester_now']) ?>
+                                    </option>
+                                <?php endwhile; ?>
+                            <?php endif; ?>
+                        </select>
+                    </div>
+                </form>
+                <p style="text-align: center; margin-top: 1rem; font-size: 0.9rem; color: #6b7280;">
+                    Viewing: <strong><?= htmlspecialchars($selected_ay_name) ?></strong> - <strong>Semester <?= htmlspecialchars($selected_sem_name) ?></strong>
+                </p>
+            </div>
+
 
             <?php if ($totalPages > 1): ?>
                 <div class="filter-row">
                     <?php $baseUrl = strtok($_SERVER['REQUEST_URI'], '?'); ?>
                     <?php foreach ($availableYears as $y): ?>
-                        <a href="<?= htmlspecialchars($baseUrl . '?year=' . urlencode($y)) ?>"
+                        <a href="<?= htmlspecialchars($baseUrl . '?ay_id=' . $ay_id . '&sem_id=' . $sem_id . '&year=' . urlencode($y)) ?>"
                            class="year-tab <?= ($selectedYear === (string)$y) ? 'active' : '' ?>"><?= htmlspecialchars($y) ?></a>
                     <?php endforeach; ?>
                 </div>
